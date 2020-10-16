@@ -7,6 +7,7 @@ class WonderfulSudokuSolver {
   static constexpr size_t N = 9;
   using Board = std::array<std::array<int, N>, N>;
   std::pair<int, int> NotFound = {-1, -1};
+  std::vector<Board> answers;
   Board board;
 
  public:
@@ -24,7 +25,7 @@ class WonderfulSudokuSolver {
 
   void Solve() {
     if (FindEmpty() == NotFound) {
-      Output();
+      answers.push_back(board);
       return;
     }
     auto [empty_row, empty_column] = FindEmpty();
@@ -34,6 +35,19 @@ class WonderfulSudokuSolver {
       board[empty_row][empty_column] = number;
       Solve();
       board[empty_row][empty_column] = 0;
+    }
+  }
+
+  void Output() {
+    int id = 1;
+    for (Board& answer : answers) {
+      printf("Answer %d:\n", id++);
+      for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+          printf("%d", answer[i][j]);
+        }
+        putchar('\n');
+      }
     }
   }
 
@@ -83,19 +97,42 @@ class WonderfulSudokuSolver {
     }
     return res;
   }
+};
 
-  void Output() {
-    for (int i = 0; i < N; ++i) {
-      for (int j = 0; j < N; ++j) {
-        printf("%2d ", board[i][j]);
-      }
-      putchar('\n');
-    }
+class Timer {
+ public:
+  // (second)
+  double get_elapsed_time() {
+    return static_cast<double>(get_cycle() - start_) /
+           static_cast<double>(clock_frequency_);
+  }
+
+  void start() { start_ = get_cycle(); }
+
+ private:
+  int64_t start_;
+  static constexpr int64_t clock_frequency_ = 1800000000; // Local
+  //static constexpr int64_t clock_frequency_ = 3000000000; // AtCoder
+  //static constexpr int64_t clock_frequency_ = 3600000000; // Codeforces
+  //static constexpr int64_t clock_frequency_ = 2300000000; // yukicoder
+
+  int64_t get_cycle() {
+    uint32_t low, high;
+    __asm__ volatile("rdtsc" : "=a"(low), "=d"(high));
+    return (static_cast<int64_t>(low)) | (static_cast<int64_t>(high) << 32);
   }
 };
 
+
 int main() {
+  Timer time;
+  time.start();
   WonderfulSudokuSolver solver;
   solver.Input();
   solver.Solve();
+  solver.Output();
+
+  printf("Execution time : %.15lf\n", time.get_elapsed_time());
+
+  return 0;
 }
