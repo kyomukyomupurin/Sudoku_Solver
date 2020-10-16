@@ -43,6 +43,7 @@ class WonderfulSudokuSolver {
   void Output() {
     int id = 1;
     for (Board& answer : answers) {
+      putchar('\n');
       printf("Answer %d:\n", id++);
       for (int i = 0; i < N; ++i) {
         for (int j = 0; j < N; ++j) {
