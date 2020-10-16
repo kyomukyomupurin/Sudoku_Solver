@@ -8,9 +8,9 @@
 class WonderfulSudokuSolver {
   static constexpr size_t N = 9;
   using Board = std::array<std::array<int, N>, N>;
-  std::pair<int, int> NotFound = {-1, -1};
-  std::vector<Board> answers;
   Board board;
+  std::vector<Board> answers;
+  std::pair<int, int> NotFound = {-1, -1};
 
  public:
   WonderfulSudokuSolver() = default;
@@ -32,13 +32,13 @@ class WonderfulSudokuSolver {
       answers.push_back(board);
       return;
     }
-    auto [id_row, id_column] = FindEmpty();
-    std::vector<int> candidates = GetPlaceableNumbers(id_row, id_column);
+    auto [id_row, id_col] = FindEmpty();
+    std::vector<int> candidates = GetPlaceableNumbers(id_row, id_col);
     if (candidates.empty()) return;
     for (int number : candidates) {
-      Set(id_row, id_column, number);
+      Set(id_row, id_col, number);
       Solve();
-      Set(id_row, id_column, 0);
+      Set(id_row, id_col, 0);
     }
   }
 
@@ -57,34 +57,32 @@ class WonderfulSudokuSolver {
   }
 
  private:
-  bool IsEmpty(int id_row, int id_column) {
-    return board[id_row][id_column] == 0;
+  bool IsEmpty(int id_row, int id_col) { return board[id_row][id_col] == 0; }
+
+  void Set(int id_row, int id_col, int number) {
+    board[id_row][id_col] = number;
   }
 
-  void Set(int id_row, int id_column, int number) {
-    board[id_row][id_column] = number;
-  }
-
-  bool IsPlaceable_Row(int id, int number) {
-    for (int i = 0; i < N; ++i) {
-      if (board[id][i] == number) return false;
+  bool IsPlaceable_Row(int id_row, int number) {
+    for (int col = 0; col < N; ++col) {
+      if (board[id_row][col] == number) return false;
     }
     return true;
   }
 
-  bool IsPlaceable_Column(int id, int number) {
-    for (int i = 0; i < N; ++i) {
-      if (board[i][id] == number) return false;
+  bool IsPlaceable_Column(int id_col, int number) {
+    for (int row = 0; row < N; ++row) {
+      if (board[row][id_col] == number) return false;
     }
     return true;
   }
 
-  bool IsPlaceable_Block(int id_row, int id_column, int number) {
+  bool IsPlaceable_Block(int id_row, int id_col, int number) {
     int center_row = id_row / 3 * 3 + 1;
-    int center_column = id_column / 3 * 3 + 1;
-    for (int i = center_row - 1; i <= center_row + 1; ++i) {
-      for (int j = center_column - 1; j <= center_column + 1; ++j) {
-        if (board[i][j] == number) return false;
+    int center_col = id_col / 3 * 3 + 1;
+    for (int row = center_row - 1; row <= center_row + 1; ++row) {
+      for (int col = center_col - 1; col <= center_col + 1; ++col) {
+        if (board[row][col] == number) return false;
       }
     }
     return true;
@@ -99,21 +97,21 @@ class WonderfulSudokuSolver {
     return {-1, -1};
   }
 
-  std::vector<int> GetPlaceableNumbers(int id_row, int id_column) {
+  std::vector<int> GetPlaceableNumbers(int id_row, int id_col) {
     std::vector<int> res;
     for (int number = 1; number <= N; ++number) {
       bool can = true;
       if (!IsPlaceable_Row(id_row, number)) can = false;
-      if (!IsPlaceable_Column(id_column, number)) can = false;
-      if (!IsPlaceable_Block(id_row, id_column, number)) can = false;
+      if (!IsPlaceable_Column(id_col, number)) can = false;
+      if (!IsPlaceable_Block(id_row, id_col, number)) can = false;
       if (can) res.emplace_back(number);
     }
     return res;
   }
 
-  bool Decidable(int id_row, int id_column) {
-    return IsEmpty(id_row, id_column) &&
-           GetPlaceableNumbers(id_row, id_column).size() == 1;
+  bool Decidable(int id_row, int id_col) {
+    return IsEmpty(id_row, id_col) &&
+           GetPlaceableNumbers(id_row, id_col).size() == 1;
   }
 
   void Heuristic1() {
@@ -131,32 +129,31 @@ class WonderfulSudokuSolver {
     }
   }
 
-  bool CheckRow(int id_row, int id_column, int number) {
-    for (int column = 0; column < N; ++column) {
-      if (column == id_column) continue;
-      if (IsEmpty(id_row, column) && IsPlaceable_Column(column, number))
-        return false;
+  bool CheckRow(int id_row, int id_col, int number) {
+    for (int col = 0; col < N; ++col) {
+      if (col == id_col) continue;
+      if (IsEmpty(id_row, col) && IsPlaceable_Column(col, number)) return false;
     }
     return true;
   }
 
-  bool CheckColumn(int id_row, int id_column, int number) {
+  bool CheckColumn(int id_row, int id_col, int number) {
     for (int row = 0; row < N; ++row) {
       if (row == id_row) continue;
-      if (IsEmpty(row, id_column) && IsPlaceable_Row(row, number)) return false;
+      if (IsEmpty(row, id_col) && IsPlaceable_Row(row, number)) return false;
     }
     return true;
   }
 
-  bool CheckBlock(int id_row, int id_column, int number) {
+  bool CheckBlock(int id_row, int id_col, int number) {
     int center_row = id_row / 3 * 3 + 1;
-    int center_column = id_column / 3 * 3 + 1;
-    for (int i = center_row - 1; i <= center_row + 1; ++i) {
-      for (int j = center_column - 1; j <= center_column + 1; ++j) {
-        if (i == id_row && j == id_column) continue;
-        if (IsEmpty(i, j)) {
+    int center_col = id_col / 3 * 3 + 1;
+    for (int row = center_row - 1; row <= center_row + 1; ++row) {
+      for (int col = center_col - 1; col <= center_col + 1; ++col) {
+        if (row == id_row && col == id_col) continue;
+        if (IsEmpty(row, col)) {
           if (IsPlaceable_Row(id_row, number) &&
-              IsPlaceable_Column(id_column, number)) {
+              IsPlaceable_Column(id_col, number)) {
             return false;
           }
         }
@@ -169,15 +166,15 @@ class WonderfulSudokuSolver {
     bool flag = true;
     while (flag) {
       flag = false;
-      for (int i = 0; i < N; ++i) {
-        for (int j = 0; j < N; ++j) {
-          if (board[i][j] == 0) {
-            std::vector<int> candidates = GetPlaceableNumbers(i, j);
+      for (int row = 0; row < N; ++row) {
+        for (int col = 0; col < N; ++col) {
+          if (board[row][col] == 0) {
+            std::vector<int> candidates = GetPlaceableNumbers(row, col);
             for (int number : candidates) {
-              if (CheckRow(i, j, number) || CheckColumn(i, j, number) ||
-                  CheckBlock(i, j, number)) {
+              if (CheckRow(row, col, number) || CheckColumn(row, col, number) ||
+                  CheckBlock(row, col, number)) {
                 flag = true;
-                Set(i, j, number);
+                Set(row, col, number);
                 continue;
               }
             }
