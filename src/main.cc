@@ -3,6 +3,7 @@
 int main() {
   WonderfulSudokuSolver solver;
   solver.Input();
+  solver.Init();
   solver.Solve();
   solver.Output();
 
