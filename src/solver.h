@@ -17,27 +17,13 @@ class WonderfulSudokuSolver {
 
   void Input() {
     for (int i = 0; i < N; ++i) {
-      char str[10];
+      char str[N + 1];
       scanf("%s", str);
       for (int j = 0; j < N; ++j) {
         board[i][j] = (isdigit(str[j]) ? str[j] - '0' : 0);
       }
     }
-  }
-
-  void Init() {
-    bool flag = true;
-    while (flag) {
-      flag = false;
-      for (int i = 0; i < N; ++i) {
-        for (int j = 0; j < N; ++j) {
-          if (Decidable(i, j)) {
-            board[i][j] = GetPlaceableNumbers(i, j)[0];
-            flag = true;
-          }
-        }
-      }
-    }
+    Init();
   }
 
   void Solve() {
@@ -117,7 +103,22 @@ class WonderfulSudokuSolver {
   }
 
   bool Decidable(int empty_row, int empty_column) {
-    return board[empty_row][empty_column] == 0 && GetPlaceableNumbers(empty_row, empty_column).size() == 1;
+    return board[empty_row][empty_column] == 0 &&
+           GetPlaceableNumbers(empty_row, empty_column).size() == 1;
   }
 
+  void Init() {
+    bool flag = true;
+    while (flag) {
+      flag = false;
+      for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+          if (Decidable(i, j)) {
+            board[i][j] = GetPlaceableNumbers(i, j)[0];
+            flag = true;
+          }
+        }
+      }
+    }
+  }
 };
