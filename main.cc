@@ -24,17 +24,16 @@ class WonderfulSudokuSolver {
 
   void Solve() {
     if (FindEmpty() == NotFound) {
+      Output();
       return;
     }
     auto [empty_row, empty_column] = FindEmpty();
-  }
-
-  void Output() {
-    for (int i = 0; i < N; ++i) {
-      for (int j = 0; j < N; ++j) {
-        printf("%2d ", board[i][j]);
-      }
-      putchar('\n');
+    std::vector<int> candidates = GetPlaceableNumbers(empty_row, empty_column);
+    if (candidates.empty()) return;
+    for (int number : candidates) {
+      board[empty_row][empty_column] = number;
+      Solve();
+      board[empty_row][empty_column] = 0;
     }
   }
 
@@ -54,7 +53,14 @@ class WonderfulSudokuSolver {
   }
 
   bool Placeable_Block(int id_row, int id_column, int number) {
-    // TO DO
+    int center_row = id_row / 3 * 3 + 1;
+    int center_column = id_column / 3 * 3 + 1;
+    for (int i = center_row - 1; i <= center_row + 1; ++i) {
+      for (int j = center_column - 1; j <= center_column + 1; ++j) {
+        if (board[i][j] == number) return false;
+      }
+    }
+    return true;
   }
 
   std::pair<int, int> FindEmpty() {
@@ -77,11 +83,19 @@ class WonderfulSudokuSolver {
     }
     return res;
   }
+
+  void Output() {
+    for (int i = 0; i < N; ++i) {
+      for (int j = 0; j < N; ++j) {
+        printf("%2d ", board[i][j]);
+      }
+      putchar('\n');
+    }
+  }
 };
 
 int main() {
   WonderfulSudokuSolver solver;
   solver.Input();
-  // solver.Solve();
-  solver.Output();
+  solver.Solve();
 }
