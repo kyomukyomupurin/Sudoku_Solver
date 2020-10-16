@@ -9,7 +9,7 @@ int main() {
   solver.Solve();
   solver.Output();
 
-  printf("Execution time : %.15lf\n", time.get_elapsed_time());
+  printf("Execution time : %.7lf\n", time.get_elapsed_time());
 
   return 0;
 }
