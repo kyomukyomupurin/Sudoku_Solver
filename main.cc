@@ -1,26 +1,33 @@
 #include <algorithm>
+#include <array>
 #include <iostream>
 #include <vector>
 
 class SudokuSolver {
-  static constexpr int N = 9;
-  std::vector<std::vector<int>> board;
+  static constexpr size_t N = 9;
+  using Board = std::array<std::array<int, N>, N>;
+  std::pair<int, int> NotFound = {-1, -1};
+  Board board;
 
  public:
-  SudokuSolver() {
-    board.assign(N, std::vector<int>(N));
-  }
+  SudokuSolver() = default;
 
   void Input() {
     for (int i = 0; i < N; ++i) {
-      char str[10]; scanf("%s", str);
+      char str[10];
+      scanf("%s", str);
       for (int j = 0; j < N; ++j) {
         board[i][j] = (isdigit(str[j]) ? str[j] - '0' : 0);
       }
     }
   }
 
-  void Solve() {}
+  void Solve() {
+    if (FindEmpty() == NotFound) {
+      return;
+    }
+    auto [empty_column, empty_row] = FindEmpty();
+  }
 
   void Output() {
     for (int i = 0; i < N; ++i) {
@@ -32,12 +39,36 @@ class SudokuSolver {
   }
 
  private:
-  bool Placeable_Row(int id, int number) {}
+  bool Placeable_Row(int id, int number) {
+    for (int i = 0; i < N; ++i) {
+      if (board[id][i] == number) {
+        return false;
+      }
+    }
+    return true;
+  }
 
-  bool Placeable_Column(int id, int number) {}
+  bool Placeable_Column(int id, int number) {
+    for (int i = 0; i < N; ++i) {
+      if (board[i][id] == number) {
+        return false;
+      }
+    }
+    return true;
+  }
 
   bool Placeable_Block(int id, int number) {}
 
+  std::pair<int, int> FindEmpty() {
+    for (int i = 0; i < N; ++i) {
+      for (int j = 0; j < N; ++j) {
+        if (board[i][j] == 0) {
+          return {i, j};
+        }
+      }
+    }
+    return {-1, -1};
+  }
 };
 
 int main() {
