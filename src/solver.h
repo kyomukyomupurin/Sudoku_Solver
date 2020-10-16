@@ -25,6 +25,21 @@ class WonderfulSudokuSolver {
     }
   }
 
+  void Init() {
+    bool flag = true;
+    while (flag) {
+      flag = false;
+      for (int i = 0; i < N; ++i) {
+        for (int j = 0; j < N; ++j) {
+          if (Decidable(i, j)) {
+            board[i][j] = GetPlaceableNumbers(i, j)[0];
+            flag = true;
+          }
+        }
+      }
+    }
+  }
+
   void Solve() {
     if (FindEmpty() == NotFound) {
       answers.push_back(board);
@@ -100,4 +115,9 @@ class WonderfulSudokuSolver {
     }
     return res;
   }
+
+  bool Decidable(int empty_row, int empty_column) {
+    return board[empty_row][empty_column] == 0 && GetPlaceableNumbers(empty_row, empty_column).size() == 1;
+  }
+
 };
