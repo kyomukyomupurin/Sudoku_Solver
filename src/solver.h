@@ -155,7 +155,8 @@ class WonderfulSudokuSolver {
       for (int j = center_column - 1; j <= center_column + 1; ++j) {
         if (i == id_row && j == id_column) continue;
         if (IsEmpty(i, j)) {
-          if (IsPlaceable_Row(id_row, number) && IsPlaceable_Column(id_column, number)) {
+          if (IsPlaceable_Row(id_row, number) &&
+              IsPlaceable_Column(id_column, number)) {
             return false;
           }
         }
@@ -173,7 +174,8 @@ class WonderfulSudokuSolver {
           if (board[i][j] == 0) {
             std::vector<int> candidates = GetPlaceableNumbers(i, j);
             for (int number : candidates) {
-              if (CheckRow(i, j, number) || CheckColumn(i, j, number) || CheckBlock(i, j, number)) {
+              if (CheckRow(i, j, number) || CheckColumn(i, j, number) ||
+                  CheckBlock(i, j, number)) {
                 flag = true;
                 Set(i, j, number);
                 continue;
