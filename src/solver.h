@@ -4,6 +4,7 @@
 #include <array>
 #include <iostream>
 #include <vector>
+#include <stack>
 
 class WonderfulSudokuSolver {
   static constexpr size_t N = 9;
@@ -36,9 +37,53 @@ class WonderfulSudokuSolver {
     std::vector<int> candidates = GetPlaceableNumbers(id_row, id_col);
     if (candidates.empty()) return;
     for (int number : candidates) {
+      std::stack<std::pair<int, int>> st;
       Set(id_row, id_col, number);
+      st.emplace(id_row, id_col);
+
+      // Heuristic1
+      bool flag = true;
+      while (flag) {
+        flag = false;
+        for (int row = 0; row < N; ++row) {
+          for (int col = 0; col < N; ++col) {
+            if (Decidable(row, col)) {
+              Set(row, col, GetPlaceableNumbers(row, col)[0]);
+              st.emplace(row, col);
+              flag = true;
+            }
+          }
+        }
+      }
+
+      // Heuristic2
+      flag = true;
+      while (flag) {
+        flag = false;
+        for (int row = 0; row < N; ++row) {
+          for (int col = 0; col < N; ++col) {
+            if (board[row][col] == 0) {
+              std::vector<int> candidates = GetPlaceableNumbers(row, col);
+              for (int number : candidates) {
+                if (CheckRow(row, col, number) || CheckColumn(row, col, number) ||
+                    CheckBlock(row, col, number)) {
+                  flag = true;
+                  Set(row, col, number);
+                  st.emplace(row, col);
+                  continue;
+                }
+              }
+            }
+          }
+        }
+      }
+
       Solve();
-      Set(id_row, id_col, 0);
+      while (!st.empty()) {
+        auto [row, col] = st.top();
+        st.pop();
+        Reset(row, col);
+      }
     }
   }
 
@@ -61,6 +106,10 @@ class WonderfulSudokuSolver {
 
   void Set(int id_row, int id_col, int number) {
     board[id_row][id_col] = number;
+  }
+
+  void Reset(int id_row, int id_col) {
+    Set(id_row, id_col, 0);
   }
 
   bool IsPlaceable_Row(int id_row, int number) {
@@ -89,9 +138,9 @@ class WonderfulSudokuSolver {
   }
 
   std::pair<int, int> FindEmpty() {
-    for (int i = 0; i < N; ++i) {
-      for (int j = 0; j < N; ++j) {
-        if (IsEmpty(i, j)) return {i, j};
+    for (int row = 0; row < N; ++row) {
+      for (int col = 0; col < N; ++col) {
+        if (IsEmpty(row, col)) return {row, col};
       }
     }
     return {-1, -1};
