@@ -7,7 +7,8 @@
 #include <stack>
 
 class WonderfulSudokuSolver {
-  static constexpr size_t N = 9;
+  static constexpr size_t SqrtN = 4;
+  static constexpr size_t N = SqrtN * SqrtN;
   using Board = std::array<std::array<int, N>, N>;
   Board board;
   std::vector<Board> answers;
@@ -17,11 +18,16 @@ class WonderfulSudokuSolver {
   WonderfulSudokuSolver() = default;
 
   void Input() {
+    // for (int i = 0; i < N; ++i) {
+    //   char str[N + 1];
+    //   scanf("%s", str);
+    //   for (int j = 0; j < N; ++j) {
+    //     board[i][j] = (isdigit(str[j]) ? str[j] - '0' : 0);
+    //   }
+    // }
     for (int i = 0; i < N; ++i) {
-      char str[N + 1];
-      scanf("%s", str);
       for (int j = 0; j < N; ++j) {
-        board[i][j] = (isdigit(str[j]) ? str[j] - '0' : 0);
+        scanf("%d", &board[i][j]);
       }
     }
     Heuristic1();
@@ -94,7 +100,7 @@ class WonderfulSudokuSolver {
       printf("Answer %d:\n", id++);
       for (int i = 0; i < N; ++i) {
         for (int j = 0; j < N; ++j) {
-          printf("%d", answer[i][j]);
+          printf("%2d ", answer[i][j]);
         }
         putchar('\n');
       }
@@ -127,10 +133,10 @@ class WonderfulSudokuSolver {
   }
 
   bool IsPlaceable_Block(int id_row, int id_col, int number) {
-    int center_row = id_row / 3 * 3 + 1;
-    int center_col = id_col / 3 * 3 + 1;
-    for (int row = center_row - 1; row <= center_row + 1; ++row) {
-      for (int col = center_col - 1; col <= center_col + 1; ++col) {
+    int center_row = id_row / SqrtN * SqrtN;
+    int center_col = id_col / SqrtN * SqrtN;
+    for (int row = center_row; row < center_row + SqrtN; ++row) {
+      for (int col = center_col; col < center_col + SqrtN; ++col) {
         if (board[row][col] == number) return false;
       }
     }
@@ -195,10 +201,10 @@ class WonderfulSudokuSolver {
   }
 
   bool CheckBlock(int id_row, int id_col, int number) {
-    int center_row = id_row / 3 * 3 + 1;
-    int center_col = id_col / 3 * 3 + 1;
-    for (int row = center_row - 1; row <= center_row + 1; ++row) {
-      for (int col = center_col - 1; col <= center_col + 1; ++col) {
+    int center_row = id_row / SqrtN * SqrtN;
+    int center_col = id_col / SqrtN * SqrtN;
+    for (int row = center_row; row < center_row + SqrtN; ++row) {
+      for (int col = center_col; col < center_col + SqrtN; ++col) {
         if (row == id_row && col == id_col) continue;
         if (IsEmpty(row, col)) {
           if (IsPlaceable_Row(id_row, number) &&
