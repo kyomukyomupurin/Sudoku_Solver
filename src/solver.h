@@ -18,13 +18,6 @@ class WonderfulSudokuSolver {
   WonderfulSudokuSolver() = default;
 
   void Input() {
-    // for (int i = 0; i < N; ++i) {
-    //   char str[N + 1];
-    //   scanf("%s", str);
-    //   for (int j = 0; j < N; ++j) {
-    //     board[i][j] = (isdigit(str[j]) ? str[j] - '0' : 0);
-    //   }
-    // }
     for (int i = 0; i < N; ++i) {
       for (int j = 0; j < N; ++j) {
         scanf("%d", &board[i][j]);
